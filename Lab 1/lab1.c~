@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	
 	for(k = 0; k < n; k++)
 	{
-		randA[k] = (rand()%201)-100;
+		randA[k] = (rand()%200)-100;
 		printf("%2d: %3.2f\n",(k+1),randA[k]);
 	}
 
