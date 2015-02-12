@@ -25,9 +25,10 @@ int main(){
 		{
 			
 			printf("Child pid:%d ppid:%d\n",getpid(),getppid());
-			childpid = fork();
-			printf("Childs child pid:%d ppid:%d\n",getpid(),getppid());
 			exit(0);
+			childpid = fork();
+			//printf("\n\tChilds child pid:%d ppid:%d\n",getpid(),getppid());
+			//exit(0);
 		}
 		else
 		{
