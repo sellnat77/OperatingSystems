@@ -11,7 +11,8 @@ int main(){
 	printf("Enter input: ");
 	scanf("%d", &input);
 	pid_t childpid;
-/*
+
+
 	for(k = 0;k < input; k++)
 	{
 		childpid = fork();
@@ -22,16 +23,19 @@ int main(){
 		}
 		else if(childpid == 0)
 		{
-			printf("Parent(%d): %d\n",k+1,getppid());
+			
+			printf("Child (%d): %d\n",k+1,getpid());
+			childpid = fork();
 			printf("Child (%d): %d\n",k+1,getpid());
 			exit(0);
 		}
 		else
 		{
+			printf("Parent(%d): %d\n",k+1,getppid());
 			wait(NULL);
 		}
 	}
-*/
+/*
 	childpid = fork();
 
 	if(childpid < 0)
@@ -50,7 +54,7 @@ int main(){
 		wait(NULL);
 	}
 
-
+*/
 
 /*
 	
