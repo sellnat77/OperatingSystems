@@ -11,8 +11,49 @@ int main(){
 	printf("Enter input: ");
 	scanf("%d", &input);
 	pid_t childpid;
+/*
 	for(k = 0;k < input; k++)
 	{
+		childpid = fork();
+		if(childpid < 0)
+		{
+			printf("error");
+			exit(1);
+		}
+		else if(childpid == 0)
+		{
+			printf("Parent(%d): %d\n",k+1,getppid());
+			printf("Child (%d): %d\n",k+1,getpid());
+			exit(0);
+		}
+		else
+		{
+			wait(NULL);
+		}
+	}
+*/
+	childpid = fork();
+
+	if(childpid < 0)
+	{
+		printf("error");
+		exit(1);
+	}
+	else if(childpid == 0)
+	{
+		printf("Parent(%d): %d\n",k+1,getppid());
+		printf("Child (%d): %d\n",k+1,getpid());
+		exit(0);
+	}
+	else
+	{
+		wait(NULL);
+	}
+
+
+
+/*
+	
 		//childpid = fork();
 		printf("\n\nParent id = %d and child id is %d", getppid(), getpid());
 		//printf(" Current process id is %d\n", childpid);
@@ -31,8 +72,10 @@ int main(){
 			exit(1); 		
 		}
 	}
+*/
 	//printf("\n\nParent id = %d and child id is %d", getppid(), getpid());
 	//printf(" Current process id is %d\n", getppid());
 	exit(0);
+
 }
 
