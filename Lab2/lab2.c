@@ -11,7 +11,7 @@ int main()
 {
 	int input;
 	int k = 0;
-	printf("Enter input: ");
+	printf("\n\nEnter input: ");
 	scanf("%d", &input);
 	pid_t childpid;
 	k = 0;
@@ -35,6 +35,7 @@ int main()
 		}
 		k++;
 	}
+	
 	exit(1);
 }
 

@@ -11,7 +11,7 @@ int main()
 {
 	int input;
 	int k = 0;
-	printf("Enter input: ");
+	printf("\n\nEnter input: ");
 	scanf("%d", &input);
 	pid_t childpid;
 	k = 0;
@@ -29,15 +29,14 @@ int main()
 		else
 		{
 			wait(NULL);
-			//printf("\n\nCurrent pid:%d\tppid:%d",getpid(),getppid());
-			//printf("\tMy child is:%d\n",childpid);
-
 			printf("\n\nCurrent pid:%d\tMy Child is:%d",getpid(),childpid);
 			printf("\tppid:%d\n",getppid());
 			exit(1);
 		}
 		k++;
 	}
+	
 	exit(1);
+	printf("\n\n\n");
 }
 
