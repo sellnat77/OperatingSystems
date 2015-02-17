@@ -4,10 +4,10 @@
 #include <unistd.h>
 #include <ctype.h>
 
-int main(){
+int main()
+{
 	int input;
 	int k = 0;
-	//int status = 0;
 	printf("Enter input: ");
 	scanf("%d", &input);
 	pid_t childpid;
@@ -21,20 +21,18 @@ int main(){
 			exit(-1);
 		}
 		else if(childpid == 0)
-		{
-				
+		{	
 		}
 		else
 		{
 			wait(NULL);
-			printf("\n\nCurrent pid:%d ppid:%d\n",getpid(),getppid());
+			printf("\n\nCurrent pid:%d\tppid:%d",getpid(),getppid());
 			printf("\tMy child is:%d\n",childpid);
-			exit(0);
+			exit(1);
 		}
 		k++;
 	}
-	printf("\tParent(%d): %d Current:%d\n\n",k+1,getppid(),getpid());
-	exit(0);
-
+	printf("Parent:%d\tCurrent:%d\tChild:%d\n\n",getppid(),getpid(),childpid);
+	exit(1);
 }
 
