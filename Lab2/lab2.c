@@ -23,19 +23,15 @@ int main()
 		{
 			exit(-1);
 		}
-		else if(childpid == 0)
-		{	
-		}
-		else
+		else if(childpid>0)
 		{
 			wait(NULL);
-			printf("\n\nCurrent pid:%d\tMy Child is:%d",getpid(),childpid);
-			printf("\tppid:%d\n",getppid());
+			printf("\n\n\tppid:%d\tCurrent pid:%d\tMy Child is:%d\n",getppid(),getpid(),childpid);
 			exit(1);
 		}
 		k++;
 	}
-	
+	printf("\n\n\tppid:%d\tCurrent pid:%d\tMy Child is:%d\n",getppid(),getpid(),childpid);
 	exit(1);
 }
 
