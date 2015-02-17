@@ -1,3 +1,6 @@
+/*Name: Russell Tan
+ *           011529945
+ */
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,8 +29,8 @@ int main()
 		else
 		{
 			wait(NULL);
-			printf("\n\nCurrent pid:%d\tppid:%d",getpid(),getppid());
-			printf("\tMy child is:%d\n",childpid);
+			printf("\n\nCurrent pid:%d\tMy Child is:%d",getpid(),childpid);
+			printf("\tppid:%d\n",getppid());
 			exit(1);
 		}
 		k++;
