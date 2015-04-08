@@ -16,8 +16,12 @@ typedef int buffer_item;
 buffer_item buffer[BUFFER_SIZE];
 void initialize_buffer();
 int insert_item(buffer_item item);
-int remove_item(buffer_item item);
+int remove_item(buffer_item *item);
 pthread_mutex_t mutex;
+
+sem_t sem;
+
+int bufferCounter;
 
 
 
@@ -33,6 +37,7 @@ int main(int argc, char *argv[])
 	int consumers;
 	
 	int k;
+	
 	if (argc < 2)
 	{
 		printf("\n Error\n");
@@ -40,34 +45,53 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		timeOut = strtol(argv[1],NULL,0);
-		producers = strtol(argv[2],NULL,0);
-		consumers = strtol(argv[3],NULL,0);
+		timeOut = atoi(argv[1]);
+		producers =atoi(argv[2]);
+		consumers =atoi(argv[3]);
 	}
 	pthread_t producerThreads[producers];
 	pthread_t consumerThreads[consumers];
 	
 	printf("TimeOut = %2d producers = %2d consumers = %2d",timeOut,producers,consumers);
 	
-	for(k = 0; k < producers; k++)
+	for(k = 0; k < producers+consumers; k++)
 	{
-		printf("\n\nCreating producer thread");
-		pthread_create(&producerThreads[k],NULL,(void *)producer,NULL);
-		//pthread_join(producerThreads[k],NULL);
+		if(k < producers)
+		{
+			printf("\n\nCreating producer thread");
+			pthread_create(&producerThreads[k],NULL,(void *)producer,(void *)&buffer);
+		}
+		if(k < consumers)
+		{
+			printf("\n\nCreating consumer thread");
+			pthread_create(&consumerThreads[k],NULL,(void *)consumer,(void *) &buffer);
+		}
+		
+	}
+	/*
+	printf("\n\nCreating producer thread");
+	pthread_create(&producerThread,NULL,(void *)producer,(void *)&buffer);
+	printf("\n\nCreating consumer thread");
+	pthread_create(&consumerThread,NULL,(void *)consumer,(void *) &buffer);
+	*/
+	for(k = 0; k < producers+consumers; k++)
+	{
+		if(k < producers)
+		{
+			printf("\n\tStarting producer thread");
+			pthread_join(producerThreads[k],NULL);
+		}
+		if(k < consumers)
+		{
+			printf("\n\tStarting consumer thread");
+			pthread_join(consumerThreads[k],NULL);
+		}
+		
 	}
 	
-	for(k = 0; k < producers; k++)
-	{
-		pthread_join(producerThreads[k],NULL);
-	}
-	for(k = 0; k < consumers; k++)
-	{
-		printf("\n\nCreating consumer thread");
-		//pthread_create(&consumerThreads[k],NULL,(void *)consumer,(void *) &timeOut);
-		//pthread_join(consumerThreads[k],NULL);
-	}
-	
-	
+	//pthread_join(producerThread,NULL);
+	//pthread_join(consumerThread,NULL);
+	sleep(timeOut);
 	
 	return 0;
 }
@@ -77,54 +101,66 @@ void *producer(void *param)
 {
 	printf("\n\tEntered producer mode");
 	buffer_item item;
-	//GRAB LOCK
-	pthread_mutex_lock(&mutex);
+	
+	
 	while(1)
 	{
 		sleep(1);
 		item = rand()%201-100;
+		
+		//GRAB LOCK
+		pthread_mutex_lock(&mutex);
+		
 		if(insert_item(item))
 		{
 			printf("ERROR");
 		}
 		else
 		{
-			printf("Producer produced %3d",item);
+			printf("\n\tProducer produced %3d",item);
 		}
+		//RELEASE LOCK
+		pthread_mutex_unlock(&mutex);
 	}
-	//RELEASE LOCK
-	pthread_mutex_unlock(&mutex);
-	pthread_exit(0);
+	
 }
 
 
 void *consumer(void *param)
 {
-	printf("Entered consumer mode");
+	printf("\n\tntered consumer mode");
 	buffer_item item;
 	//GRAB LOCK
-	pthread_mutex_lock(&mutex);
+	
 	while(1)
 	{
 		sleep(1);
 		item = rand()%201-100;
-		if(remove_item(item))
+		
+		
+		pthread_mutex_lock(&mutex);
+		
+		if(remove_item(&item))
 		{
 			printf("ERROR");
+
 		}
 		else
 		{
-			printf("Consumer consumed %3d",item);
+			printf("\n\t\tConsumer consumed %3d",item);
+
 		}
+		//RELEASE LOCK
+		pthread_mutex_unlock(&mutex);
 	}
-	//RELEASE LOCK
-	pthread_mutex_unlock(&mutex);
-	pthread_exit(0);
 }
 
 void initialize_buffer()
 {
 	pthread_mutex_init(&mutex,NULL);
+	sem_init(&sem,0,5);
+	
+	bufferCounter = 0;
 	int k; 
 	for(k = 0; k < BUFFER_SIZE; k++)
 	{
@@ -135,30 +171,29 @@ void initialize_buffer()
 
 int insert_item(buffer_item item)
 {
-	int k;
-	for(k = 0; k < BUFFER_SIZE; k++)
+	if(bufferCounter < BUFFER_SIZE)
 	{
-		if(buffer[k] == 0)
-		{
-			buffer[k] = item;
-			return 0;
-		}
+		buffer[bufferCounter] = item;
+		bufferCounter++;
+		return 0;
 	}
-	
-	return -1;
+	else
+	{
+		return -1;
+	}
 }
 
-int remove_item(buffer_item item)
+int remove_item(buffer_item *item)
 {
-	int k;
-	for(k = BUFFER_SIZE-1; k >= 0; k--)
+	if(bufferCounter > 0)
 	{
-		if(buffer[k] != 0)
-		{
-			buffer[k] = 0;
-			return 0;
-		}
+		*item = buffer[bufferCounter-1];
+		bufferCounter--;
+		return 0;
 	}
-	return -1;
+	else
+	{
+		return -1;
+	}
 }
 
