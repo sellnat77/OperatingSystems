@@ -1,4 +1,3 @@
-
 /* Lab 5 - Producers and consumers
  * 
  * Russell Tan
@@ -8,29 +7,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <semaphore.h>
-#include <unistd.h>
 
 typedef int buffer_item;
-#define BUFFER_SIZE 10
+#define BUFFER_SIZE 5
 
+//Global variables
 buffer_item buffer[BUFFER_SIZE];
+pthread_mutex_t mutex;
+sem_t full,empty;//Two semaphors for empty and full buffer
+int bufferCounter;//Used for insert and remove
+
+//Method declarations
 void initialize_buffer();
 int insert_item(buffer_item item);
 int remove_item(buffer_item *item);
-pthread_mutex_t mutex;
 
-sem_t full,empty;
-
-int bufferCounter;
-
-
-
+//For pthreads
 void *producer(void *param);
 void *consumer(void *param);
 
-
 //Main method
 int main(int argc, char *argv[]){
+	//Variables from command line args
 	int timeOut;
 	int producers;
 	int consumers;
@@ -46,44 +44,39 @@ int main(int argc, char *argv[]){
 		producers =atoi(argv[2]);
 		consumers =atoi(argv[3]);
 	}
+	//Create thread arrays based on cl args
 	pthread_t producerThreads[producers];
 	pthread_t consumerThreads[consumers];
 	
-	printf("TimeOut = %2d producers = %2d consumers = %2d",timeOut,producers,consumers);
+	printf("TimeOut = %2d producers = %2d consumers = %2d\n\n",timeOut,producers,consumers);
 	
+	//Initialize the global values and buffer
 	initialize_buffer();
 	
+	//Create the threads
 	for(k = 0; k < producers; k++){
 
-		printf("\n\nCreating producer thread");
 		pthread_create(&producerThreads[k],NULL,producer,NULL);
-
-		
 	}
 	for(k = 0; k < consumers; k++){
-		
-		printf("\n\nCreating consumer thread");
 		pthread_create(&consumerThreads[k],NULL,consumer,NULL);
-	
 	}
+	
 	sleep(timeOut);
+	printf("\n\n\n");
 	
 	exit(0);
 }
 
-
 void *producer(void *param){
-	printf("\n\tEntered producer mode");
 	buffer_item item;
-	
 	
 	while(1){
 		sleep(1);
 		item = rand()%201-100;
 		
-		//GRAB LOCK
-		
-		
+		//Grab lock and dec. empty because 
+		//there's 1 less empty spot in buffer
 		sem_wait(&empty);
 		pthread_mutex_lock(&mutex);
 		
@@ -93,68 +86,64 @@ void *producer(void *param){
 		else{
 			printf("\n\tProducer produced %3d",item);
 		}
-		//RELEASE LOCK
+		//Release lock and increment full because
+		//there's 1 more value in the buffer
 		pthread_mutex_unlock(&mutex);
-		//sem_wait(&sem);
 		sem_post(&full);
-		
-		
 	}
 	
 }
 
-
 void *consumer(void *param){
-	printf("\n\tEntered consumer mode");
 	buffer_item item;
-	//GRAB LOCK
 	
 	while(1){
 		sleep(2);
 		item = rand()%201-100;
 		
-		
+		//Grab lock and dec. full because
+		//there's 1 less item in the buffer
 		sem_wait(&full);
 		pthread_mutex_lock(&mutex);
-		
-		
+				
 		if(remove_item(&item)){
 			printf("Consumer ERROR");
-
 		}
 		else{
-			printf("\n\t\tConsumer consumed %3d",item);
-
+			printf("\n\t\t\t\tConsumer consumed %3d",item);
 		}
-		//RELEASE LOCK
+		
+		//Release lock and inc.empty because
+		//there's 1 more empty spot in the buffer
 		pthread_mutex_unlock(&mutex);
-		//sem_wait(&sem);
 		sem_post(&empty);
 	}
 }
 
 void initialize_buffer(){
 	pthread_mutex_init(&mutex,NULL);
+	
+	//Full starts at 0 because there are 0 taken spots in the buffer 
 	sem_init(&full,0,0);
+	
+	//Empty starts at BUFFER SIZE because there are BUFFER SIZE
+	//empty spots in the buffer
 	sem_init(&empty,0,BUFFER_SIZE);
 	
 	bufferCounter = 0;
+	
 	int k; 
 	for(k = 0; k < BUFFER_SIZE; k++){
 		buffer[k] = 0;
 	}
-	
 }
 
 int insert_item(buffer_item item){
+	//If current index is not at the end of the buffer
+	//insert value at end and move index forward
 	if(bufferCounter < BUFFER_SIZE){
 		buffer[bufferCounter] = item;
 		bufferCounter++;
-		//int k;
-		//for(k = 0; k < BUFFER_SIZE; k++)
-		//{
-		//	printf("\n%2d.)  %3d",k,buffer[k]);
-		//}
 		return 0;
 	}
 	else{
@@ -163,6 +152,8 @@ int insert_item(buffer_item item){
 }
 
 int remove_item(buffer_item *item){
+	//If index is not at beginning, set the current value to the 
+	//previous value and move the index backwards
 	if(bufferCounter > 0){
 		*item = buffer[(bufferCounter-1)];
 		bufferCounter--;
