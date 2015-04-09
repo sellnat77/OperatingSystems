@@ -1,4 +1,5 @@
-/* Lab 5 - Producers and consumers
+/* Lab 5 - Producers and consumers 
+ * Grade A+
  * 
  * Russell Tan
  * ID: 011529945
@@ -120,24 +121,6 @@ void *consumer(void *param){
 	}
 }
 
-void initialize_buffer(){
-	pthread_mutex_init(&mutex,NULL);
-	
-	//Full starts at 0 because there are 0 taken spots in the buffer 
-	sem_init(&full,0,0);
-	
-	//Empty starts at BUFFER SIZE because there are BUFFER SIZE
-	//empty spots in the buffer
-	sem_init(&empty,0,BUFFER_SIZE);
-	
-	bufferCounter = 0;
-	
-	int k; 
-	for(k = 0; k < BUFFER_SIZE; k++){
-		buffer[k] = 0;
-	}
-}
-
 int insert_item(buffer_item item){
 	//If current index is not at the end of the buffer
 	//insert value at end and move index forward
@@ -164,3 +147,20 @@ int remove_item(buffer_item *item){
 	}
 }
 
+void initialize_buffer(){
+	pthread_mutex_init(&mutex,NULL);
+	
+	//Full starts at 0 because there are 0 taken spots in the buffer 
+	sem_init(&full,0,0);
+	
+	//Empty starts at BUFFER SIZE because there are BUFFER SIZE
+	//empty spots in the buffer
+	sem_init(&empty,0,BUFFER_SIZE);
+	
+	bufferCounter = 0;
+	
+	int k; 
+	for(k = 0; k < BUFFER_SIZE; k++){
+		buffer[k] = 0;
+	}
+}
