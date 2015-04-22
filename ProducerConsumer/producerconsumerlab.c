@@ -31,6 +31,7 @@ void *consumer(void *param);
 
 //Main method
 int main(int argc, char *argv[]){
+	srand(time(NULL));
 	int timeOut;
 	int producers;
 	int consumers;
