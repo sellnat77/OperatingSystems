@@ -26,9 +26,9 @@ int allocation[5][3] = {
 	};
 
 void consume();
-void release();
+void release(int);
 void populateMax(int,int,int);
-int request(int,int,int);
+int request(int,int[]);
 
 int main(int arg, char* argc[]) 
 {	
@@ -46,12 +46,12 @@ void consume()
 	for( k = 0; k < 3; k++)
 	{
 		sleep(rand()*3);
-		request(rand()*avail[0],rand()*avail[1],rand()*avail[2]);
+		request(1,avail);
 	}
-	release();
+	release(1);
 }
 
-void release()
+void release(int customerNum)
 {
 	
 }
@@ -65,24 +65,15 @@ void populateMax(int limR1,int limR2,int limR3)
 		{
 			max[k][m] = (rand())%(avail[m]+1);
 		}
-		/*
-		max[k][0] = (rand())%limR1;
-		max[k][1] = (rand())%limR2;
-		max[k][2] = (rand())%limR3;
-		*/
 		printf("\nROne: %2d RTwo: %2d RThree: %2d\n",max[k][0],max[k][1],max[k][2]);
 	}
 }
 
-int request(int A,int B,int C)
+int request(int A,int B[])
 {
-	int bool = 1;
+	int bool = 0;
 	
 	
 	
-	
-	
-	
-	
-	exit(bool);
+	return(bool);
 }
