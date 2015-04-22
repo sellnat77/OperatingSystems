@@ -29,7 +29,11 @@ void *consumer(void *param);
 
 //Main method
 int main(int argc, char *argv[]){
+<<<<<<< HEAD
+	//Variables from command line args
+=======
 	srand(time(NULL));
+>>>>>>> de1af1405cf4172859e871980dd931e6e0994a94
 	int timeOut;
 	int producers;
 	int consumers;
