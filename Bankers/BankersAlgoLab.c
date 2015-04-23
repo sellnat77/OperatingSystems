@@ -27,14 +27,16 @@ int allocation[5][3] = {
 
 pthread_mutex_t mutex;
 
-void *consume(void *param);
+void *consume(int *param);
 void release(int);
 void populateMax(int,int,int);
-int request(int,int[]);
+int request(int,int[]*);
+int number=0;
 
 int main(int arg, char* argc[]) 
 {	
 	int k;
+	srand(time(NULL));
 	avail[0] = atoi(argc[1]);
 	avail[1] = atoi(argc[2]);
 	avail[2] = atoi(argc[3]);
@@ -44,14 +46,14 @@ int main(int arg, char* argc[])
 	
 	for(k = 0; k < 5; k++)
 	{
-		pthread_create(&consumerThreads[k],NULL,consume,NULL);
+		pthread_create(&consumerThreads[k],NULL,consume,(int *)k);
 	}
 	
 	sleep(10);
 	return(0);
 }
 
-void *consume(void *param)
+void *consume(int *param)
 {
 	int k;
 	int randArr[3];
@@ -63,60 +65,22 @@ void *consume(void *param)
 		sleep(rand()%3);
 		
 		pthread_mutex_lock(&mutex);
-		printf("\n\tHello from Consumer: %d",abs((int)(pthread_self())));
-		request(abs((int)(pthread_self())),randArr);
+		printf("\n\tHello from Consumer: %d",*param);
+		request(*param,randArr);
 		pthread_mutex_unlock(&mutex);
 		
 	}
-	release(abs((int)(pthread_self())));
+	release(*param);
 }
 
-int request(int A,int B[3])
+int request(int A,int (*B)[3])
 {
+	
 	int k,m;
 	int bool = 0;
 	printf("\nCustomer number is: %d",A);
 	printf("\nRequesting %d  %d  %d",B[0],B[1],B[2]);
-	for(m = 0; m < 5; m++)
-	{
-		for(k = 0; k < 3; k++)
-		{
-			bool = 1;
-			if(B[k] <= need[m][k])
-			{
-				if(B[k] <= avail[m][k])
-				{
-					avail[m][k] = avail[m][k]-B[k];
-					allocation[m][k] = allocation[m][k]+B[k];
-					need[m][k] = need[k]-B[k];
-					if(checkSafety(avail) == 0)
-					{
-						
-						printf("failed");
-						avail[m][k] = avail[m][k]+B[k];
-						allocation[m][k] = allocation[m][k]-B[k];
-						need[m][k] = need[m][k]+B[k];
-						bool = 0;
-						break;
-					}
-					else
-					{
-						printf("passed");
-						break;
-					}
-				}
-				else
-				{
-					//wait
-				}
-			}
-			else
-			{
-				break;
-				bool = 0;
-			}
-		}
-	}
+
 	return(bool);
 }
 
@@ -138,7 +102,7 @@ void populateMax(int limR1,int limR2,int limR3)
 	}
 }
 
-int checkSafety(int[] arr)
+int checkSafety(int arr[])
 {
 	int k;
 	for(k = 0; k < 3; k++)
